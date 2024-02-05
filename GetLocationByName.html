@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bing Maps Find Location by Address</title>
+    <style>
+        #map {
+            position: absolute;
+            width: 60%;
+            height: 100%;
+        }
+        #info {
+            position: absolute;
+            right: 0;
+            width: 40%;
+            height: 100%;
+            overflow: auto;
+        }
+        table {
+            width: 100%;
+        }
+    </style>
+    <script src="https://www.bing.com/api/maps/mapcontrol?callback=loadMapScenario" async defer></script>
+    <script type="text/javascript">
+        var map;
+
+        function loadMapScenario() {
+            map = new Microsoft.Maps.Map(document.getElementById('map'), {
+                credentials: 'AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS'
+            });
+
+            document.getElementById('findButton').addEventListener('click', function () {
+                var address = document.getElementById('addressInput').value;
+
+                var requestUrl = "http://dev.virtualearth.net/REST/v1/Locations?locality=" + address + "&o=json&key=AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS";
+
+                fetch(requestUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        var locationData = data.resourceSets[0].resources[0];
+                        var location = new Microsoft.Maps.Location(locationData.point.coordinates[0], locationData.point.coordinates[1]);
+
+                        // Add a pushpin to the found location.
+                        var pushpin = new Microsoft.Maps.Pushpin(location);
+                        map.entities.push(pushpin);
+
+                        // Center the map on the found location.
+                        map.setView({ center: location });
+
+                        // Add the location data to the table.
+                        var table = document.getElementById('infoTable');
+                        var row = table.insertRow(-1);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        cell1.innerHTML = locationData.name;
+                        cell2.innerHTML = JSON.stringify(locationData, null, 2);
+                    });
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="info">
+        <input id="addressInput" type="text" placeholder="Enter an address">
+        <button id="findButton">Find</button>
+        <table id="infoTable">
+            <tr>
+                <th>Name</th>
+                <th>Data</th>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

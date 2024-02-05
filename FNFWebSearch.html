@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bing Web Search</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #4285f4;
+            margin-bottom: 20px;
+        }
+
+        #searchTerm {
+            width: 700px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4285f4;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #3a74c5;
+        }
+
+        #results {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        #results p {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #results a {
+            color: #4285f4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        #results a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>FNF Web Search</h1>
+    <input type="text" id="searchTerm" placeholder="Enter search term">
+    <button onclick="search()">Search</button>
+    <div id="results"></div>
+
+    <script>
+        function search() {
+            var searchTerm = document.getElementById('searchTerm').value;
+            var subscriptionKey = 'f854952cb0584b138de45a3d81b122a8';
+            var url = 'https://api.bing.microsoft.com/v7.0/search?q=' + encodeURIComponent(searchTerm);
+
+            fetch(url, {
+                headers: {
+                    'Ocp-Apim-Subscription-Key': subscriptionKey
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                var resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+                data.webPages.value.forEach(page => {
+                    var p = document.createElement('p');
+                    p.innerHTML = '<a href="' + page.url + '">' + page.name + '</a>: ' + page.snippet;
+                    resultsDiv.appendChild(p);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

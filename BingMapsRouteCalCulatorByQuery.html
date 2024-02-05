@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Bing Maps Route Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1500px;
+            margin: 20px;
+        }
+
+        form {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4285f4;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #3a74c5;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #directions {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS&callback=loadMapScenario' async defer></script>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Bing Maps Route Calculator</h1>
+        <form id="routeForm">
+            <label for="waypoint1">Waypoint 1:</label>
+            <input type="text" id="waypoint1" name="waypoint1">
+            <label for="waypoint2">Waypoint 2:</label>
+            <input type="text" id="waypoint2" name="waypoint2">
+            <input type="submit" value="Calculate Route">
+        </form>
+        <div id="map"></div>
+        <div id="directions"></div>
+    </div>
+
+    <script>
+        var map;
+
+        function loadMapScenario() {
+            map = new Microsoft.Maps.Map(document.getElementById('map'), {
+                credentials: 'AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS'
+            });
+
+            document.getElementById('routeForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var waypoint1 = document.getElementById('waypoint1').value;
+                var waypoint2 = document.getElementById('waypoint2').value;
+
+                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+                    var directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                    var waypoint = new Microsoft.Maps.Directions.Waypoint({ address: waypoint1 });
+                    directionsManager.addWaypoint(waypoint);
+                    waypoint = new Microsoft.Maps.Directions.Waypoint({ address: waypoint2 });
+                    directionsManager.addWaypoint(waypoint);
+
+                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directions') });
+                    directionsManager.calculateDirections();
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

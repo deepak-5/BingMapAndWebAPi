@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Bing Maps Location Recognition</title>
+    <link rel="stylesheet" href="Styles.css">
+    <script src="https://www.bing.com/api/maps/mapcontrol?callback=loadMapScenario" async defer></script>
+    <script type="text/javascript">
+        var map;
+
+        function loadMapScenario() {
+            map = new Microsoft.Maps.Map(document.getElementById('map'), {
+                credentials: 'AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS'
+            });
+
+            Microsoft.Maps.Events.addHandler(map, 'click', function (e) {
+                var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+                var location = e.target.tryPixelToLocation(point);
+
+                var requestUrl = "http://dev.virtualearth.net/REST/v1/LocationRecog/" + location.latitude + "," + location.longitude + "?radius=0.25&top=5&datetime=2024-02-03T00:00:00&distanceunit=KM&verboseplacenames=true&key=AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS";
+
+                fetch(requestUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        var locationData = data.resourceSets[0].resources[0];
+                        displayBusinessData(locationData.businessesAtLocation);
+                    });
+            });
+        }
+
+        function displayBusinessData(businesses) {
+            var table = document.getElementById('infoTable');
+            table.innerHTML = ''; // Clear existing table
+
+            for (var i = 0; i < businesses.length; i++) {
+                var business = businesses[i];
+
+                var row = table.insertRow(-1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+
+                cell1.innerHTML = '<strong>Entity Name:</strong><br>' + business.businessInfo.entityName;
+                cell2.innerHTML = '<strong>Address:</strong><br>' + formatAddress(business.businessAddress) +
+                    '<br><strong>URL:</strong><br><a href="' + business.businessInfo.url + '" target="_blank">' +
+                    business.businessInfo.url + '</a><br><strong>Phone:</strong><br>' + business.businessInfo.phone +
+                    '<br><strong>Type:</strong><br>' + business.businessInfo.type;
+
+                // Additional information, if available
+                if (business.businessInfo.otherTypes) {
+                    cell2.innerHTML += '<br><strong>Other Types:</strong><br>' + business.businessInfo.otherTypes.join(', ');
+                }
+            }
+        }
+
+        function formatAddress(address) {
+            return address.addressLine + ', ' + address.locality + ', ' + address.adminDivision +
+                ', ' + address.countryIso2 + '-' + address.postalCode;
+        }
+    </script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="info">
+        <table id="infoTable">
+            <tr>
+                <th>Entity Name & Details</th>
+                <th>Address & Information</th>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

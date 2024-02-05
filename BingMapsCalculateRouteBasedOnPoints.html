@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Bing Maps Route Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1600px;
+            margin: 20px;
+        }
+
+        form {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"] {
+            background-color: #4285f4;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #3a74c5;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #directions {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS&callback=loadMapScenario' async defer></script>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Bing Maps Route Calculator</h1>
+        <form id="routeForm">
+            <input type="submit" value="Calculate Route">
+        </form>
+        <div id="map"></div>
+        <div id="directions"></div>
+    </div>
+
+    <script>
+        var map;
+        var waypoints = [];
+
+        function loadMapScenario() {
+            map = new Microsoft.Maps.Map(document.getElementById('map'), {
+                credentials: 'AqwSMujmkBQpYFcKt52vr-0wn2oQj6TKf-gYT8eKC-qG9Sdn9umwrxPf3HaCR6xS'
+            });
+
+            Microsoft.Maps.Events.addHandler(map, 'click', function (event) {
+                var point = new Microsoft.Maps.Point(event.getX(), event.getY());
+                var location = event.target.tryPixelToLocation(point);
+                waypoints.push(location);
+                var pushpin = new Microsoft.Maps.Pushpin(location);
+                map.entities.push(pushpin);
+            });
+
+            document.getElementById('routeForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+                    var directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                    waypoints.forEach(function (location) {
+                        var waypoint = new Microsoft.Maps.Directions.Waypoint({ location: location });
+                        directionsManager.addWaypoint(waypoint);
+                    });
+
+                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('directions') });
+                    directionsManager.calculateDirections();
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

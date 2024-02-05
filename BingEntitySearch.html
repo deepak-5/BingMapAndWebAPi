@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bing Search</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #4285f4;
+            margin-bottom: 20px;
+        }
+
+        #searchForm {
+            width: 100%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4285f4;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #3a74c5;
+        }
+
+        #results {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        #results p {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>FNF Bing Search</h1>
+    <form id="searchForm">
+        <label for="query">Enter your search query:</label>
+        <input type="text" id="query" name="query">
+        <input type="submit" value="Search">
+    </form>
+    <div id="results"></div>
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var query = document.getElementById('query').value;
+            var bingKey = 'f854952cb0584b138de45a3d81b122a8';
+            var url = 'https://api.bing.microsoft.com/v7.0/entities?q=' + encodeURIComponent(query) + '&mkt=en-US&count=10&offset=0&safesearch=Moderate';
+            fetch(url, {
+                headers: {
+                    'Ocp-Apim-Subscription-Key': bingKey
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the search data here
+                var resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+                if (data.entities && data.entities.value && data.entities.value.length > 0) {
+                    var p = document.createElement('p');
+                    p.textContent = data.entities.value[0].description;
+                    resultsDiv.appendChild(p);
+                } else {
+                    p.textContent = 'No specific fact found for ' + query;
+                    resultsDiv.appendChild(p);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
